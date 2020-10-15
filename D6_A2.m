@@ -48,3 +48,7 @@ plot(dates,cases1829,'d','DisplayName',columnname)
 [bestfitcoeff, ~, mu] = polyfit(datenum(dates), cases1829, 3);
 p = polyval(bestfitcoeff, datenum(dates), [], mu);
 plot(dates, p, 'Displayname', "Best Fit: Ages 18-29")
+
+% get user input for a date, to then use in predicting the total amount of
+% cases on that date
+userdate = datetime(input("Enter a date (yyyy-MM-dd) to either predict or return the total number of COVID-19 cases on that date: ", 's'), 'InputFormat', 'yyyy-MM-dd');
