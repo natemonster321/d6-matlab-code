@@ -4,6 +4,9 @@
 clear;
 clc;
 
+% define a constant to specify which decision to use; number from 1-3
+DECISION=1;
+
 % extract the entire dataset into a variable 'data', then extract dates and
 % Total Cases from the dataset
 opts = detectImportOptions("D6_A2_COVID-19_Daily_Cases__Deaths__and_Hospitalizations");
@@ -35,8 +38,8 @@ hold on
 % add a line of best fit to the above plotted data
 % condition the polynomial using the inbuilt features of polyfit i order to
 % achieve a better fit
-[bestfitcoeff, ~, mu] = polyfit(datenum(dates), totalcases, 3);
-p = polyval(bestfitcoeff, datenum(dates), [], mu);
+[bestfitcoefftotal, ~, mu] = polyfit(datenum(dates), totalcases, 3);
+p = polyval(bestfitcoefftotal, datenum(dates), [], mu);
 plot(dates, p, 'DisplayName', "Best Fit: Total Cases")
 
 % plot data for those ages 18-29
@@ -45,10 +48,24 @@ columnname = strrep(char(data.Properties.VariableNames(6)),'_','-');
 plot(dates,cases1829,'d','DisplayName',columnname)
 
 % add a line of best fit to the above plotted data
-[bestfitcoeff, ~, mu] = polyfit(datenum(dates), cases1829, 3);
-p = polyval(bestfitcoeff, datenum(dates), [], mu);
+[bestfitcoeff1829, ~, mu] = polyfit(datenum(dates), cases1829, 3);
+p = polyval(bestfitcoeff1829, datenum(dates), [], mu);
 plot(dates, p, 'Displayname', "Best Fit: Ages 18-29")
+
+% ask the user for additional data points? perhaps enter in the amount of
+% cases for a certain date to get a better fit, then proceed with the next
+% "decision?"
 
 % get user input for a date, to then use in predicting the total amount of
 % cases on that date
 userdate = datetime(input("Enter a date (yyyy-MM-dd) to either predict or return the total number of COVID-19 cases on that date: ", 's'), 'InputFormat', 'yyyy-MM-dd');
+
+% return predicted cases with model and cases for this date in the past (if
+% data exists)
+p = polyval(bestfitcoefftotal, datenum(userdate));
+predictedCases = p(1);
+
+% then, depending on decision, decide what to do with that data
+if DECISION == 1
+end
+    
