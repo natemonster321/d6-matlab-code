@@ -38,8 +38,8 @@ hold on
 % add a line of best fit to the above plotted data
 % condition the polynomial using the inbuilt features of polyfit i order to
 % achieve a better fit
-[bestfitcoefftotal, ~, mu] = polyfit(datenum(dates), totalcases, 3);
-p = polyval(bestfitcoefftotal, datenum(dates), [], mu);
+bestfitcoefftotal = polyfit(datenum(dates), totalcases, 3);
+p = polyval(bestfitcoefftotal, datenum(dates));
 plot(dates, p, 'DisplayName', "Best Fit: Total Cases")
 
 % plot data for those ages 18-29
@@ -48,8 +48,8 @@ columnname = strrep(char(data.Properties.VariableNames(6)),'_','-');
 plot(dates,cases1829,'d','DisplayName',columnname)
 
 % add a line of best fit to the above plotted data
-[bestfitcoeff1829, ~, mu] = polyfit(datenum(dates), cases1829, 3);
-p = polyval(bestfitcoeff1829, datenum(dates), [], mu);
+bestfitcoeff1829 = polyfit(datenum(dates), cases1829, 3);
+p = polyval(bestfitcoeff1829, datenum(dates));
 plot(dates, p, 'Displayname', "Best Fit: Ages 18-29")
 
 % ask the user for additional data points? perhaps enter in the amount of
@@ -62,10 +62,35 @@ userdate = datetime(input("Enter a date (yyyy-MM-dd) to either predict or return
 
 % return predicted cases with model and cases for this date in the past (if
 % data exists)
+% because this is extreme extrapolation of data, these numbers are not
+% guaranteed at all to be accurate.
 p = polyval(bestfitcoefftotal, datenum(userdate));
 predictedCases = p(1);
+sprintf('%19.f', predictedCases);
 
 % then, depending on decision, decide what to do with that data
+% decision 1: decide whether or not to give a preliminary warning in mid
+% march-april
 if DECISION == 1
+    % index 1 of the totalcases array is march 1st, 2020, while index 61 is
+    % april 30th, 2020; this corresponds to the number of days in the time
+    % period. It is also the time period at the beginning of the
+    % dataset used.
+    % here, we use trapz (trapezoidal integration) to find the total number
+    % of cases over a certain time period (from March to April)
+    marchaprilcases = trapz(totalcases(1:61));
+    disp("The number of total cases in the past from March to April were: " + marchaprilcases)
+    % here, we predict the number of cases over the same time period, from
+    % March to April, but in 2021, using the equation of best fit plotted
+    % earlier
+    p = polyval(bestfitcoefftotal, (datenum('01-Mar-2021'):datenum('30-Apr-2021')));
+    marchaprilpredicted = trapz(p(1:61));
+    disp("The number of total cases predicted in the future from March 2021 to April 2021 are: " + marchaprilpredicted)
+    % check whether the number of cases has decreased or increased compared
+    % to the same time period last year; then advise the user with a
+    % decision based on the data
+    if marchaprilpredicted >= marchaprilcases
+        disp("The total number of COVID-19 cases is predicted to increase. It is advisable to issue a warning and request the public to uphold social distancing and mask guidelines.")
+    elseif marchaprilpredicted < marchaprilcases
+        disp("The total number of COVID-19 cases is predicted to decrease. It is advisable to remain cautious, but the spread of COVID-19 may decrease if current guidelines are upheld until then.")
 end
-    
