@@ -64,9 +64,9 @@ userdate = datetime(input("Enter a date (yyyy-MM-dd) to either predict or return
 % data exists)
 % because this is extreme extrapolation of data, these numbers are not
 % guaranteed at all to be accurate.
-p = polyval(bestfitcoefftotal, datenum(userdate));
-predictedCases = p(1);
-sprintf('%19.f', predictedCases);
+%p = polyval(bestfitcoefftotal, datenum(userdate));
+%predictedCases = p(1);
+%sprintf('%19.f', predictedCases);
 
 % then, depending on decision, decide what to do with that data
 % decision 1: decide whether or not to give a preliminary warning in mid
@@ -93,4 +93,14 @@ if DECISION == 1
         disp("The total number of COVID-19 cases is predicted to increase. It is advisable to issue a warning and request the public to uphold social distancing and mask guidelines.")
     elseif marchaprilpredicted < marchaprilcases
         disp("The total number of COVID-19 cases is predicted to decrease. It is advisable to remain cautious, but the spread of COVID-19 may decrease if current guidelines are upheld until then.")
+    else
+        disp("Data was not properly input")
+    end
+end
+
+if DECISION == 2
+    
+end
+
+if DECISION == 3
 end
