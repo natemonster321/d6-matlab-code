@@ -5,7 +5,7 @@ clear;
 clc;
 
 % define a constant to specify which decision to use; number from 1-3
-DECISION=1;
+DECISION=2;
 
 % extract the entire dataset into a variable 'data', then extract dates and
 % Total Cases from the dataset
@@ -99,7 +99,69 @@ if DECISION == 1
 end
 
 if DECISION == 2
+    userage = input("Please enter your age: ");
+    % if the age is between 18 and 29 (inclusive), then calculate the
+    % prediction for a future date with that dataset. otherwise, use the
+    % totalcases dataset.
     
+    % get user input for a date in format yyyy-MM-dd then convert it
+    % from a string to MATLAB's special datetime format
+    userdate = datetime(input("Enter a date (yyyy-MM-dd) to predict the total number of COVID-19 cases on that date: ", 's'), 'InputFormat', 'yyyy-MM-dd');
+      
+    % generate a date to plug into the current data so we can compare
+    % predicted cases for a date to the current data we have for that
+    % date, though in 2020
+    datestring=datestr(userdate);
+    datecurrent = replaceBetween(datestr(userdate), 8, 11, '2020');
+    dateindex = find(dates==datecurrent);
+    
+    if (userage >= 18) && (userage <= 29)
+        % use the best fit polynomial found earlier to predict cases for
+        % the given date
+        p = polyval(bestfitcoeff1829, datenum(userdate));
+        disp("The predicted number of cases for this date is: " + p(1))
+        
+        % display the past cases in 2020 for the date specified, if
+        % possible; otherwise, compare to the max number of cases in 2020
+        if isempty(dateindex)
+            disp("There is no data for this date in 2020; so the predicted value will be compared to the maximum number of cases in a day in 2020.")
+            disp("The maximum amount of cases in a day in 2020 is: " + max(totalcases))
+            if p(1) >= max(totalcases)
+                disp("The predicted COVID cases for " + datestring + " are greater than or equal to the maximum number of cases in a day in 2020.")
+            elseif p(1) < max(totalcases)
+                disp("The predicted COVID cases for " + datestring + " are lower than the maximum number of cases in a day in 2020.")
+            end
+        else
+            if p(1) >= totalcases(dateindex)
+                disp("The predicted COVID cases for " + datestring + " are greater than or equal to the number of cases on the same date in 2020.")
+            elseif p(1) < totalcases(dateindex)
+                disp("The predicted COVID cases for " + datestring + " are lower than the number of cases on the same date in 2020.")
+            end
+        end
+        
+    else
+        % use best fit for total cases to predict cases for the given date
+        p = polyval(bestfitcoefftotal, datenum(userdate));
+        disp("The predicted number of cases for this date is: " + p(1))
+        
+        % display the past cases in 2020 for the date specified, if
+        % possible; otherwise, compare to the max number of cases in 2020
+        if isempty(dateindex)
+            disp("There is no data for this date in 2020; so the predicted value will be compared to the maximum number of cases in a day in 2020.")
+            disp("The maximum amount of cases in a day in 2020 is: " + max(totalcases))
+            if p(1) >= max(totalcases)
+                disp("The predicted COVID cases for " + datestring + " are greater than or equal to the maximum number of cases in a day in 2020.")
+            elseif p(1) < max(totalcases)
+                disp("The predicted COVID cases for " + datestring + " are lower than the maximum number of cases in a day in 2020.")
+            end
+        else
+            if p(1) >= totalcases(dateindex)
+                disp("The predicted COVID cases for " + datestring + " are greater than or equal to the number of cases on the same date in 2020.")
+            elseif p(1) < totalcases(dateindex)
+                disp("The predicted COVID cases for " + datestring + " are lower than the number of cases on the same date in 2020.")
+            end
+        end
+    end
 end
 
 if DECISION == 3
