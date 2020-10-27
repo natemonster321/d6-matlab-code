@@ -52,22 +52,7 @@ bestfitcoeff1829 = polyfit(datenum(dates), cases1829, 3);
 p = polyval(bestfitcoeff1829, datenum(dates));
 plot(dates, p, 'Displayname', "Best Fit: Ages 18-29")
 
-% ask the user for additional data points? perhaps enter in the amount of
-% cases for a certain date to get a better fit, then proceed with the next
-% "decision?"
-
-% get user input for a date, to then use in predicting the total amount of
-% cases on that date
-userdate = datetime(input("Enter a date (yyyy-MM-dd) to either predict or return the total number of COVID-19 cases on that date: ", 's'), 'InputFormat', 'yyyy-MM-dd');
-
-% return predicted cases with model and cases for this date in the past (if
-% data exists)
-% because this is extreme extrapolation of data, these numbers are not
-% guaranteed at all to be accurate.
-%p = polyval(bestfitcoefftotal, datenum(userdate));
-%predictedCases = p(1);
-%sprintf('%19.f', predictedCases);
-
+hold off
 % then, depending on decision, decide what to do with that data
 % decision 1: decide whether or not to give a preliminary warning in mid
 % march-april
