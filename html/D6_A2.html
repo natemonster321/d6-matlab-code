@@ -183,15 +183,15 @@ hold <span class="string">off</span>
             disp(<span class="string">"There is no data for this date in 2020; so the predicted value will be compared to the maximum number of cases in a day in 2020."</span>)
             disp(<span class="string">"The maximum amount of cases in a day in 2020 is: "</span> + max(totalcases))
             <span class="keyword">if</span> p(1) &gt;= max(totalcases)
-                disp(<span class="string">"The predicted COVID cases for "</span> + datestring + <span class="string">" are greater than or equal to the maximum number of cases in a day in 2020."</span>)
+                disp(<span class="string">"The predicted COVID cases for "</span> + datestring + <span class="string">" are greater than or equal to the maximum number of cases in a day in 2020 by "</span> + abs(p(1)-max(totalcases)))
             <span class="keyword">elseif</span> p(1) &lt; max(totalcases)
-                disp(<span class="string">"The predicted COVID cases for "</span> + datestring + <span class="string">" are lower than the maximum number of cases in a day in 2020."</span>)
+                disp(<span class="string">"The predicted COVID cases for "</span> + datestring + <span class="string">" are lower than the maximum number of cases in a day in 2020 by "</span> + abs(p(1)-max(totalcases)))
             <span class="keyword">end</span>
         <span class="keyword">else</span>
             <span class="keyword">if</span> p(1) &gt;= totalcases(dateindex)
-                disp(<span class="string">"The predicted COVID cases for "</span> + datestring + <span class="string">" are greater than or equal to the number of cases on the same date in 2020."</span>)
+                disp(<span class="string">"The predicted COVID cases for "</span> + datestring + <span class="string">" are greater than or equal to the number of cases on the same date in 2020 by "</span> + abs(p(1)-totalcases(dateindex)))
             <span class="keyword">elseif</span> p(1) &lt; totalcases(dateindex)
-                disp(<span class="string">"The predicted COVID cases for "</span> + datestring + <span class="string">" are lower than the number of cases on the same date in 2020."</span>)
+                disp(<span class="string">"The predicted COVID cases for "</span> + datestring + <span class="string">" are lower than the number of cases on the same date in 2020 by "</span> + abs(p(1)-totalcases(dateindex)))
             <span class="keyword">end</span>
         <span class="keyword">end</span>
 
@@ -353,15 +353,15 @@ if DECISION == 2
             disp("There is no data for this date in 2020; so the predicted value will be compared to the maximum number of cases in a day in 2020.")
             disp("The maximum amount of cases in a day in 2020 is: " + max(totalcases))
             if p(1) >= max(totalcases)
-                disp("The predicted COVID cases for " + datestring + " are greater than or equal to the maximum number of cases in a day in 2020.")
+                disp("The predicted COVID cases for " + datestring + " are greater than or equal to the maximum number of cases in a day in 2020 by " + abs(p(1)-max(totalcases)))
             elseif p(1) < max(totalcases)
-                disp("The predicted COVID cases for " + datestring + " are lower than the maximum number of cases in a day in 2020.")
+                disp("The predicted COVID cases for " + datestring + " are lower than the maximum number of cases in a day in 2020 by " + abs(p(1)-max(totalcases)))
             end
         else
             if p(1) >= totalcases(dateindex)
-                disp("The predicted COVID cases for " + datestring + " are greater than or equal to the number of cases on the same date in 2020.")
+                disp("The predicted COVID cases for " + datestring + " are greater than or equal to the number of cases on the same date in 2020 by " + abs(p(1)-totalcases(dateindex)))
             elseif p(1) < totalcases(dateindex)
-                disp("The predicted COVID cases for " + datestring + " are lower than the number of cases on the same date in 2020.")
+                disp("The predicted COVID cases for " + datestring + " are lower than the number of cases on the same date in 2020 by " + abs(p(1)-totalcases(dateindex)))
             end
         end
         

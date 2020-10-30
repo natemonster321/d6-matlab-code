@@ -114,15 +114,15 @@ if DECISION == 2
             disp("There is no data for this date in 2020; so the predicted value will be compared to the maximum number of cases in a day in 2020.")
             disp("The maximum amount of cases in a day in 2020 is: " + max(totalcases))
             if p(1) >= max(totalcases)
-                disp("The predicted COVID cases for " + datestring + " are greater than or equal to the maximum number of cases in a day in 2020.")
+                disp("The predicted COVID cases for " + datestring + " are greater than or equal to the maximum number of cases in a day in 2020 by " + abs(p(1)-max(totalcases)))
             elseif p(1) < max(totalcases)
-                disp("The predicted COVID cases for " + datestring + " are lower than the maximum number of cases in a day in 2020.")
+                disp("The predicted COVID cases for " + datestring + " are lower than the maximum number of cases in a day in 2020 by " + abs(p(1)-max(totalcases)))
             end
         else
             if p(1) >= totalcases(dateindex)
-                disp("The predicted COVID cases for " + datestring + " are greater than or equal to the number of cases on the same date in 2020.")
+                disp("The predicted COVID cases for " + datestring + " are greater than or equal to the number of cases on the same date in 2020 by " + abs(p(1)-totalcases(dateindex)))
             elseif p(1) < totalcases(dateindex)
-                disp("The predicted COVID cases for " + datestring + " are lower than the number of cases on the same date in 2020.")
+                disp("The predicted COVID cases for " + datestring + " are lower than the number of cases on the same date in 2020 by " + abs(p(1)-totalcases(dateindex)))
             end
         end
         
