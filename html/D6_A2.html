@@ -1,0 +1,393 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>D6_A2</title><meta name="generator" content="MATLAB 9.8"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2020-10-30"><meta name="DC.source" content="D6_A2.m"><style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:100%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.1em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img, h1 img, h2 img { margin-bottom:0px; }
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+
+pre, code { font-size:12px; }
+tt { font-size: 1.2em; }
+pre { margin:0px 0px 20px; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+pre.error { color:red; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+span.typesection { color:#A0522D }
+
+.footer { width:auto; padding:10px 0px; margin:25px 0px 0px; border-top:1px dotted #878787; font-size:0.8em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; }
+.footer a { color:#878787; }
+.footer a:hover { color:#878787; text-decoration:underline; }
+.footer a:visited { color:#878787; }
+
+table th { padding:7px 5px; text-align:left; vertical-align:middle; border: 1px solid #d6d4d4; font-weight:bold; }
+table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px solid #d6d4d4; }
+
+
+
+
+
+  </style></head><body><div class="content"><pre class="codeinput"><span class="comment">% 12:30-1:45TR D6-10/2/2020 Nathan Dhanasekaran</span>
+<span class="comment">% reads data from a .csv file containing information on COVID-19 cases over</span>
+<span class="comment">% time, then processes that data by plotting it, calculating a polynomial</span>
+<span class="comment">% line of best fit, and using the data to make decisions for the future.</span>
+
+clear;
+clc;
+
+<span class="comment">% define a constant to specify which decision to use; number from 1-2</span>
+DECISION=2;
+
+<span class="comment">% extract the entire dataset into a variable 'data', then extract dates and</span>
+<span class="comment">% Total Cases from the dataset</span>
+opts = detectImportOptions(<span class="string">"D6_A2_COVID-19_Daily_Cases__Deaths__and_Hospitalizations"</span>);
+<span class="comment">% put the imported data in a variable after sorting rows and removing rows with missing data</span>
+data = sortrows(rmmissing(readtable(<span class="string">"D6_A2_COVID-19_Daily_Cases__Deaths__and_Hospitalizations.csv"</span>,opts)));
+<span class="comment">% use table2array in order to convert the table to a format that can be</span>
+<span class="comment">% read and used with MATLAB functions</span>
+dates = table2array(data(:,1));
+totalcases = table2array(data(:,2));
+
+<span class="comment">% create an initial plot with dates on the x-axis, with total</span>
+<span class="comment">% cases on the y-axis. In addition, set the name as displayed in the legend</span>
+<span class="comment">% to the title of the column in the dataset.</span>
+
+<span class="comment">% for reference, strrep (string replace) is to replace underscores in the</span>
+<span class="comment">% column names, as they cause text formatting issues when put into the</span>
+<span class="comment">% legend. this is done in a separate variable in order to keep the</span>
+<span class="comment">% plot() call readable.</span>
+columnname = strrep(char(data.Properties.VariableNames(2)),<span class="string">'_'</span>,<span class="string">'-'</span>);
+plot(dates,totalcases,<span class="string">'o'</span>,<span class="string">'DisplayName'</span>,columnname)
+title(<span class="string">"COVID-19 Total Cases Separated by Age"</span>)
+xlabel(<span class="string">"Date"</span>)
+ylabel(<span class="string">"Cases"</span>)
+<span class="comment">% this line makes sure the legend is created on the plot. this line also</span>
+<span class="comment">% uses strrep to ensure proper text formatting.</span>
+legend(strrep(char(data.Properties.VariableNames(2)),<span class="string">'_'</span>,<span class="string">'-'</span>))
+
+hold <span class="string">on</span>
+<span class="comment">% add a line of best fit to the above plotted data</span>
+<span class="comment">% condition the polynomial using the inbuilt features of polyfit i order to</span>
+<span class="comment">% achieve a better fit</span>
+bestfitcoefftotal = polyfit(datenum(dates), totalcases, 3);
+p = polyval(bestfitcoefftotal, datenum(dates));
+plot(dates, p, <span class="string">'DisplayName'</span>, <span class="string">"Best Fit: Total Cases"</span>)
+
+<span class="comment">% plot data for those ages 18-29</span>
+cases1829 = table2array(data(:,6));
+columnname = strrep(char(data.Properties.VariableNames(6)),<span class="string">'_'</span>,<span class="string">'-'</span>);
+plot(dates,cases1829,<span class="string">'d'</span>,<span class="string">'DisplayName'</span>,columnname)
+
+<span class="comment">% add a line of best fit to the above plotted data</span>
+bestfitcoeff1829 = polyfit(datenum(dates), cases1829, 3);
+p = polyval(bestfitcoeff1829, datenum(dates));
+plot(dates, p, <span class="string">'Displayname'</span>, <span class="string">"Best Fit: Ages 18-29"</span>)
+
+hold <span class="string">off</span>
+<span class="comment">% then, depending on decision, decide what to do with that data</span>
+<span class="comment">% decision 1: decide whether or not to give a preliminary warning in mid</span>
+<span class="comment">% march-april</span>
+<span class="keyword">if</span> DECISION == 1
+    <span class="comment">% index 1 of the totalcases array is march 1st, 2020, while index 61 is</span>
+    <span class="comment">% april 30th, 2020; this corresponds to the number of days in the time</span>
+    <span class="comment">% period. It is also the time period at the beginning of the</span>
+    <span class="comment">% dataset used.</span>
+    <span class="comment">% here, we use trapz (trapezoidal integration) to find the total number</span>
+    <span class="comment">% of cases over a certain time period (from March to April)</span>
+    marchaprilcases = trapz(totalcases(1:61));
+    disp(<span class="string">"The number of total cases in the past from March to April were: "</span> + marchaprilcases)
+    <span class="comment">% here, we predict the number of cases over the same time period, from</span>
+    <span class="comment">% March to April, but in 2021, using the equation of best fit plotted</span>
+    <span class="comment">% earlier</span>
+    p = polyval(bestfitcoefftotal, (datenum(<span class="string">'01-Mar-2021'</span>):datenum(<span class="string">'30-Apr-2021'</span>)));
+    marchaprilpredicted = trapz(p(1:61));
+    disp(<span class="string">"The number of total cases predicted in the future from March 2021 to April 2021 are: "</span> + marchaprilpredicted)
+    <span class="comment">% check whether the number of cases has decreased or increased compared</span>
+    <span class="comment">% to the same time period last year; then advise the user with a</span>
+    <span class="comment">% decision based on the data</span>
+    <span class="keyword">if</span> marchaprilpredicted &gt;= marchaprilcases
+        disp(<span class="string">"The total number of COVID-19 cases is predicted to increase. It is advisable to issue a warning and request the public to uphold social distancing and mask guidelines."</span>)
+    <span class="keyword">elseif</span> marchaprilpredicted &lt; marchaprilcases
+        disp(<span class="string">"The total number of COVID-19 cases is predicted to decrease. It is advisable to remain cautious, but the spread of COVID-19 may decrease if current guidelines are upheld until then."</span>)
+    <span class="keyword">else</span>
+        disp(<span class="string">"Data was not properly input"</span>)
+    <span class="keyword">end</span>
+<span class="keyword">end</span>
+
+<span class="keyword">if</span> DECISION == 2
+    userage = input(<span class="string">"Please enter your age: "</span>);
+    <span class="comment">% if the age is between 18 and 29 (inclusive), then calculate the</span>
+    <span class="comment">% prediction for a future date with that dataset. otherwise, use the</span>
+    <span class="comment">% totalcases dataset.</span>
+
+    <span class="comment">% get user input for a date in format yyyy-MM-dd then convert it</span>
+    <span class="comment">% from a string to MATLAB's special datetime format</span>
+    userdate = datetime(input(<span class="string">"Enter a date (yyyy-MM-dd) to predict the total number of COVID-19 cases on that date: "</span>, <span class="string">'s'</span>), <span class="string">'InputFormat'</span>, <span class="string">'yyyy-MM-dd'</span>);
+
+    <span class="comment">% generate a date to plug into the current data so we can compare</span>
+    <span class="comment">% predicted cases for a date to the current data we have for that</span>
+    <span class="comment">% date, though in 2020</span>
+    datestring=datestr(userdate);
+    datecurrent = replaceBetween(datestr(userdate), 8, 11, <span class="string">'2020'</span>);
+    dateindex = find(dates==datecurrent);
+
+    <span class="keyword">if</span> (userage &gt;= 18) &amp;&amp; (userage &lt;= 29)
+        <span class="comment">% use the best fit polynomial found earlier to predict cases for</span>
+        <span class="comment">% the given date</span>
+        p = polyval(bestfitcoeff1829, datenum(userdate));
+        disp(<span class="string">"The predicted number of cases for this date is: "</span> + p(1))
+
+        <span class="comment">% display the past cases in 2020 for the date specified, if</span>
+        <span class="comment">% possible; otherwise, compare to the max number of cases in 2020</span>
+        <span class="keyword">if</span> isempty(dateindex)
+            disp(<span class="string">"There is no data for this date in 2020; so the predicted value will be compared to the maximum number of cases in a day in 2020."</span>)
+            disp(<span class="string">"The maximum amount of cases in a day in 2020 is: "</span> + max(totalcases))
+            <span class="keyword">if</span> p(1) &gt;= max(totalcases)
+                disp(<span class="string">"The predicted COVID cases for "</span> + datestring + <span class="string">" are greater than or equal to the maximum number of cases in a day in 2020."</span>)
+            <span class="keyword">elseif</span> p(1) &lt; max(totalcases)
+                disp(<span class="string">"The predicted COVID cases for "</span> + datestring + <span class="string">" are lower than the maximum number of cases in a day in 2020."</span>)
+            <span class="keyword">end</span>
+        <span class="keyword">else</span>
+            <span class="keyword">if</span> p(1) &gt;= totalcases(dateindex)
+                disp(<span class="string">"The predicted COVID cases for "</span> + datestring + <span class="string">" are greater than or equal to the number of cases on the same date in 2020."</span>)
+            <span class="keyword">elseif</span> p(1) &lt; totalcases(dateindex)
+                disp(<span class="string">"The predicted COVID cases for "</span> + datestring + <span class="string">" are lower than the number of cases on the same date in 2020."</span>)
+            <span class="keyword">end</span>
+        <span class="keyword">end</span>
+
+    <span class="keyword">else</span>
+        <span class="comment">% use best fit for total cases to predict cases for the given date</span>
+        p = polyval(bestfitcoefftotal, datenum(userdate));
+        disp(<span class="string">"The predicted number of cases for this date is: "</span> + p(1))
+
+        <span class="comment">% display the past cases in 2020 for the date specified, if</span>
+        <span class="comment">% possible; otherwise, compare to the max number of cases in 2020</span>
+        <span class="keyword">if</span> isempty(dateindex)
+            disp(<span class="string">"There is no data for this date in 2020; so the predicted value will be compared to the maximum number of cases in a day in 2020."</span>)
+            disp(<span class="string">"The maximum amount of cases in a day in 2020 is: "</span> + max(totalcases))
+            <span class="keyword">if</span> p(1) &gt;= max(totalcases)
+                disp(<span class="string">"The predicted COVID cases for "</span> + datestring + <span class="string">" are greater than or equal to the maximum number of cases in a day in 2020."</span>)
+            <span class="keyword">elseif</span> p(1) &lt; max(totalcases)
+                disp(<span class="string">"The predicted COVID cases for "</span> + datestring + <span class="string">" are lower than the maximum number of cases in a day in 2020."</span>)
+            <span class="keyword">end</span>
+        <span class="keyword">else</span>
+            <span class="keyword">if</span> p(1) &gt;= totalcases(dateindex)
+                disp(<span class="string">"The predicted COVID cases for "</span> + datestring + <span class="string">" are greater than or equal to the number of cases on the same date in 2020."</span>)
+            <span class="keyword">elseif</span> p(1) &lt; totalcases(dateindex)
+                disp(<span class="string">"The predicted COVID cases for "</span> + datestring + <span class="string">" are lower than the number of cases on the same date in 2020."</span>)
+            <span class="keyword">end</span>
+        <span class="keyword">end</span>
+    <span class="keyword">end</span>
+<span class="keyword">end</span>
+</pre><pre class="codeoutput">Warning: Column headers from the file were modified to make them valid MATLAB
+identifiers before creating variable names for the table. The original column
+headers are saved in the VariableDescriptions property.
+Set 'PreserveVariableNames' to true to use the original column headers as table
+variable names. 
+Warning: Polynomial is badly conditioned. Add points with distinct X values,
+reduce the degree of the polynomial, or try centering and scaling as described
+in HELP POLYFIT. 
+Warning: Polynomial is badly conditioned. Add points with distinct X values,
+reduce the degree of the polynomial, or try centering and scaling as described
+in HELP POLYFIT. 
+</pre><pre class="codeoutput error">Error using input
+Cannot call INPUT from EVALC.
+
+Error in D6_A2 (line 89)
+    userage = input("Please enter your age: ");
+</pre><p class="footer"><br><a href="https://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2020a</a><br></p></div><!--
+##### SOURCE BEGIN #####
+% 12:30-1:45TR D6-10/2/2020 Nathan Dhanasekaran
+% reads data from a .csv file containing information on COVID-19 cases over
+% time, then processes that data by plotting it, calculating a polynomial
+% line of best fit, and using the data to make decisions for the future.
+
+clear;
+clc;
+
+% define a constant to specify which decision to use; number from 1-2
+DECISION=2;
+
+% extract the entire dataset into a variable 'data', then extract dates and
+% Total Cases from the dataset
+opts = detectImportOptions("D6_A2_COVID-19_Daily_Cases__Deaths__and_Hospitalizations");
+% put the imported data in a variable after sorting rows and removing rows with missing data
+data = sortrows(rmmissing(readtable("D6_A2_COVID-19_Daily_Cases__Deaths__and_Hospitalizations.csv",opts)));
+% use table2array in order to convert the table to a format that can be
+% read and used with MATLAB functions
+dates = table2array(data(:,1));
+totalcases = table2array(data(:,2));
+
+% create an initial plot with dates on the x-axis, with total
+% cases on the y-axis. In addition, set the name as displayed in the legend
+% to the title of the column in the dataset.
+
+% for reference, strrep (string replace) is to replace underscores in the
+% column names, as they cause text formatting issues when put into the
+% legend. this is done in a separate variable in order to keep the
+% plot() call readable.
+columnname = strrep(char(data.Properties.VariableNames(2)),'_','-');
+plot(dates,totalcases,'o','DisplayName',columnname)
+title("COVID-19 Total Cases Separated by Age")
+xlabel("Date")
+ylabel("Cases")
+% this line makes sure the legend is created on the plot. this line also
+% uses strrep to ensure proper text formatting.
+legend(strrep(char(data.Properties.VariableNames(2)),'_','-'))
+
+hold on
+% add a line of best fit to the above plotted data
+% condition the polynomial using the inbuilt features of polyfit i order to
+% achieve a better fit
+bestfitcoefftotal = polyfit(datenum(dates), totalcases, 3);
+p = polyval(bestfitcoefftotal, datenum(dates));
+plot(dates, p, 'DisplayName', "Best Fit: Total Cases")
+
+% plot data for those ages 18-29
+cases1829 = table2array(data(:,6));
+columnname = strrep(char(data.Properties.VariableNames(6)),'_','-');
+plot(dates,cases1829,'d','DisplayName',columnname)
+
+% add a line of best fit to the above plotted data
+bestfitcoeff1829 = polyfit(datenum(dates), cases1829, 3);
+p = polyval(bestfitcoeff1829, datenum(dates));
+plot(dates, p, 'Displayname', "Best Fit: Ages 18-29")
+
+hold off
+% then, depending on decision, decide what to do with that data
+% decision 1: decide whether or not to give a preliminary warning in mid
+% march-april
+if DECISION == 1
+    % index 1 of the totalcases array is march 1st, 2020, while index 61 is
+    % april 30th, 2020; this corresponds to the number of days in the time
+    % period. It is also the time period at the beginning of the
+    % dataset used.
+    % here, we use trapz (trapezoidal integration) to find the total number
+    % of cases over a certain time period (from March to April)
+    marchaprilcases = trapz(totalcases(1:61));
+    disp("The number of total cases in the past from March to April were: " + marchaprilcases)
+    % here, we predict the number of cases over the same time period, from
+    % March to April, but in 2021, using the equation of best fit plotted
+    % earlier
+    p = polyval(bestfitcoefftotal, (datenum('01-Mar-2021'):datenum('30-Apr-2021')));
+    marchaprilpredicted = trapz(p(1:61));
+    disp("The number of total cases predicted in the future from March 2021 to April 2021 are: " + marchaprilpredicted)
+    % check whether the number of cases has decreased or increased compared
+    % to the same time period last year; then advise the user with a
+    % decision based on the data
+    if marchaprilpredicted >= marchaprilcases
+        disp("The total number of COVID-19 cases is predicted to increase. It is advisable to issue a warning and request the public to uphold social distancing and mask guidelines.")
+    elseif marchaprilpredicted < marchaprilcases
+        disp("The total number of COVID-19 cases is predicted to decrease. It is advisable to remain cautious, but the spread of COVID-19 may decrease if current guidelines are upheld until then.")
+    else
+        disp("Data was not properly input")
+    end
+end
+
+if DECISION == 2
+    userage = input("Please enter your age: ");
+    % if the age is between 18 and 29 (inclusive), then calculate the
+    % prediction for a future date with that dataset. otherwise, use the
+    % totalcases dataset.
+    
+    % get user input for a date in format yyyy-MM-dd then convert it
+    % from a string to MATLAB's special datetime format
+    userdate = datetime(input("Enter a date (yyyy-MM-dd) to predict the total number of COVID-19 cases on that date: ", 's'), 'InputFormat', 'yyyy-MM-dd');
+      
+    % generate a date to plug into the current data so we can compare
+    % predicted cases for a date to the current data we have for that
+    % date, though in 2020
+    datestring=datestr(userdate);
+    datecurrent = replaceBetween(datestr(userdate), 8, 11, '2020');
+    dateindex = find(dates==datecurrent);
+    
+    if (userage >= 18) && (userage <= 29)
+        % use the best fit polynomial found earlier to predict cases for
+        % the given date
+        p = polyval(bestfitcoeff1829, datenum(userdate));
+        disp("The predicted number of cases for this date is: " + p(1))
+        
+        % display the past cases in 2020 for the date specified, if
+        % possible; otherwise, compare to the max number of cases in 2020
+        if isempty(dateindex)
+            disp("There is no data for this date in 2020; so the predicted value will be compared to the maximum number of cases in a day in 2020.")
+            disp("The maximum amount of cases in a day in 2020 is: " + max(totalcases))
+            if p(1) >= max(totalcases)
+                disp("The predicted COVID cases for " + datestring + " are greater than or equal to the maximum number of cases in a day in 2020.")
+            elseif p(1) < max(totalcases)
+                disp("The predicted COVID cases for " + datestring + " are lower than the maximum number of cases in a day in 2020.")
+            end
+        else
+            if p(1) >= totalcases(dateindex)
+                disp("The predicted COVID cases for " + datestring + " are greater than or equal to the number of cases on the same date in 2020.")
+            elseif p(1) < totalcases(dateindex)
+                disp("The predicted COVID cases for " + datestring + " are lower than the number of cases on the same date in 2020.")
+            end
+        end
+        
+    else
+        % use best fit for total cases to predict cases for the given date
+        p = polyval(bestfitcoefftotal, datenum(userdate));
+        disp("The predicted number of cases for this date is: " + p(1))
+        
+        % display the past cases in 2020 for the date specified, if
+        % possible; otherwise, compare to the max number of cases in 2020
+        if isempty(dateindex)
+            disp("There is no data for this date in 2020; so the predicted value will be compared to the maximum number of cases in a day in 2020.")
+            disp("The maximum amount of cases in a day in 2020 is: " + max(totalcases))
+            if p(1) >= max(totalcases)
+                disp("The predicted COVID cases for " + datestring + " are greater than or equal to the maximum number of cases in a day in 2020.")
+            elseif p(1) < max(totalcases)
+                disp("The predicted COVID cases for " + datestring + " are lower than the maximum number of cases in a day in 2020.")
+            end
+        else
+            if p(1) >= totalcases(dateindex)
+                disp("The predicted COVID cases for " + datestring + " are greater than or equal to the number of cases on the same date in 2020.")
+            elseif p(1) < totalcases(dateindex)
+                disp("The predicted COVID cases for " + datestring + " are lower than the number of cases on the same date in 2020.")
+            end
+        end
+    end
+end
+##### SOURCE END #####
+--></body></html>

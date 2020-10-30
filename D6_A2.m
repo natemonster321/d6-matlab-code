@@ -6,7 +6,7 @@
 clear;
 clc;
 
-% define a constant to specify which decision to use; number from 1-3
+% define a constant to specify which decision to use; number from 1-2
 DECISION=2;
 
 % extract the entire dataset into a variable 'data', then extract dates and
@@ -149,7 +149,4 @@ if DECISION == 2
             end
         end
     end
-end
-
-if DECISION == 3
 end
