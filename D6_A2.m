@@ -1,5 +1,7 @@
 % 12:30-1:45TR D6-10/2/2020 Nathan Dhanasekaran
-% [purpose]
+% reads data from a .csv file containing information on COVID-19 cases over
+% time, then processes that data by plotting it, calculating a polynomial
+% line of best fit, and using the data to make decisions for the future.
 
 clear;
 clc;
